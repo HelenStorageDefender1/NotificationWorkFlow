@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StorageDefender v2 Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS STYLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+        :root {
+            --primary-bg: #f5f6fa;
+            --sidebar-bg: #ffffff;
+            --header-bg: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --blue: #007bff;
+            --green: #28a745;
+            --red: #dc3545;
+            --orange: #fd7e14;
+            --gray: #6c757d;
+            --blue-tile-bg: #e6f2ff;
+            --green-tile-bg: #e9f6ec;
+            --red-tile-bg: #fdeaea;
+            --orange-tile-bg: #fff2e8;
+            --gray-tile-bg: #f0f2f5;
+            --font-family: 'Roboto', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 240px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+
+        .sidebar-nav ul, .sidebar-footer ul {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .sidebar-nav li a, .sidebar-footer li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .sidebar-nav li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-nav li.active a, .sidebar-nav li a:hover {
+            background-color: var(--blue-tile-bg);
+            color: var(--blue);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-right i {
+            margin-left: 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* --- Pages --- */
+        .page { display: none; padding: 20px 30px; }
+        .page.active-page { display: block; }
+
+        /* --- Banner --- */
+        .banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .warning-banner {
+            background-color: var(--red-tile-bg);
+            border: 1px solid var(--red);
+            color: #a22531;
+        }
+        .banner-content { display: flex; align-items: center; }
+        .banner-content i { margin-right: 10px; font-size: 1.2rem; }
+        .banner-actions { display: flex; align-items: center; }
+        .banner-actions span { margin-right: 15px; }
+        .banner-actions i { margin: 0 5px; cursor: pointer; }
+        .btn-link {
+            background: none;
+            border: none;
+            color: #a22531;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 15px;
+        }
+
+        /* --- Page Header & Search --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        .search-container input {
+            width: 100%;
+            padding: 10px 35px 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+        .search-container i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .search-results-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .search-results-dropdown div {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .search-results-dropdown div:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* --- Tiles --- */
+        .tiles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .tile {
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .tile h2 { font-size: 2.5rem; margin-bottom: 5px; }
+        .tile p { color: var(--text-secondary); margin-bottom: 15px; }
+        .tile-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .blue-tile { background-color: var(--blue-tile-bg); border-color: var(--blue); }
+        .blue-tile .tile-btn { border: 1px solid var(--blue); color: var(--blue); }
+        .green-tile { background-color: var(--green-tile-bg); border-color: var(--green); }
+        .green-tile .tile-btn { border: 1px solid var(--green); color: var(--green); }
+        .red-tile { background-color: var(--red-tile-bg); border-color: var(--red); }
+        .red-tile .tile-btn { border: 1px solid var(--red); color: var(--red); }
+        .orange-tile { background-color: var(--orange-tile-bg); border-color: var(--orange); }
+        .orange-tile .tile-btn { border: 1px solid var(--orange); color: var(--orange); }
+        .gray-tile { background-color: var(--gray-tile-bg); border-color: var(--gray); }
+        .gray-tile .tile-btn { border: 1px solid var(--gray); color: var(--gray); }
+        .overdue-count { color: var(--red); font-weight: bold; }
+
+        /* --- Expanded Content & Tables --- */
+        .expanded-content {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .expanded-content.visible { display: block; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;}
+        .table-filters { display: flex; align-items: center; gap: 10px; flex-grow: 1;}
+        .table-filters select, .table-filters input { padding: 8px; border-radius: 5px; border: 1px solid var(--border-color);}
+        .date-filter { font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { color: var(--text-secondary); font-weight: 500; }
+        .status { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8rem; text-align: center; }
+        .status-overdue { background-color: var(--red-tile-bg); color: var(--red); }
+        .status-pending { background-color: #f0f2f5; color: #6c757d; }
+        .status-to-do { background-color: #e6f2ff; color: #007bff; }
+        .status-severe { background-color: #5c0a14; color: white; }
+        .status-critical { background-color: #dc3545; color: white; }
+        .btn-resolve {
+            background-color: var(--orange);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-resolve i { margin-right: 5px; }
+
+        /* --- Bottom Panels --- */
+        .panels-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .panel { background: white; border-radius: 8px; border: 1px solid var(--border-color); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .panel-header h3 i { margin-right: 8px; }
+        .panel-body { padding: 15px; }
+        .panel-body input { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid var(--border-color); }
+        .panel-actions button { margin-top: 10px; }
+        .btn-primary { background: var(--blue); color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-secondary { background: #f0f2f5; color: var(--text-primary); padding: 10px 15px; border: 1px solid var(--border-color); border-radius: 5px; cursor: pointer; }
+        .activity-feed p { margin-bottom: 12px; font-size: 0.9rem; }
+        .activity-feed p i { margin-right: 8px; color: var(--text-secondary); }
+
+        /* --- Generic & Utility --- */
+        .hidden { display: none !important; }
+        .btn-green { background-color: var(--green); color: white; }
+        .btn-red { background-color: var(--red); color: white; }
+        .btn-disabled { background-color: #ccc; cursor: not-allowed; border-color: #ccc; color: #888 !important;}
+        .btn { padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
+        .icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--blue); }
+        .form-row { display: flex; gap: 20px; align-items: center; margin-bottom: 15px; }
+        .form-row > * { flex: 1; }
+        .comment-box { width: 100%; height: 80px; resize: vertical; padding: 8px; border: 1px solid var(--border-color); border-radius: 5px; }
+        .error-message { color: var(--red); background-color: var(--red-tile-bg); border: 1px solid var(--red); padding: 10px; border-radius: 5px; margin-top: 15px; text-align: center; }
+
+        /* --- Modals --- */
+        #modal-backdrop {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+        }
+        .modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            z-index: 1050;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 5px 15px rgba(0,0,0,.5);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 1.8rem; }
+        .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+        .modal-body .form-group { margin-bottom: 15px; }
+        .modal-body label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .modal-body select, .modal-body input[type="text"], .modal-body textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; }
+        .modal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .modal-footer { text-align: right; margin-top: 25px; }
+        .modal-tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
+        .modal-tab { padding: 10px 15px; cursor: pointer; color: var(--text-secondary); }
+        .modal-tab.active { border-bottom: 2px solid var(--blue); color: var(--blue); font-weight: bold; }
+        .modal-tab-content { display: none; }
+        .modal-tab-content.active { display: block; }
+
+        /* --- Specific Page/Modal Styles --- */
+        /* Renter Profile */
+        #renters-profile-page .page-header-alt { display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; }
+        #renters-profile-page .profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        #renters-profile-page .profile-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        #renters-profile-page .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
+        #renters-profile-page input { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; }
+        #renters-profile-page .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* Assign Devices */
+        #assign-devices-page .content-wrapper { padding: 20px; }
+        #assign-devices-page .back-link { font-size: 1.2rem; color: var(--text-primary); text-decoration: none; margin-bottom: 20px; display: inline-block; }
+        #assign-devices-page h2 { margin-bottom: 15px; }
+        #assign-devices-page .inventory-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        #assign-devices-page .inventory-box { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        #assign-devices-page .inventory-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        #assign-devices-page .device-health { display: flex; align-items: center; gap: 5px; }
+        #assign-devices-page .health-icon { width: 12px; height: 12px; background: var(--green); border-radius: 50%; }
+        #assign-devices-page .low-battery { background: var(--orange); color: white; padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-text">StorageDefender</div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#"><i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fa-solid fa-server"></i> Smart Units</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user-group"></i> Renters</a></li>
+                    <li><a href="#"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a></li>
+                    <li><a href="#"><i class="fa-solid fa-vector-square"></i> Smart Zones</a></li>
+                    <li><a href="#"><i class="fa-solid fa-building"></i> Manage Facility</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chart-pie"></i> Reports</a></li>
+                    <li><a href="#"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+                    <li><a href="#"><i class="fa-solid fa-file-lines"></i> Audit Log</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                 <ul>
+                    <li><a href="#"><i class="fa-solid fa-circle-question"></i> Help Resources</a></li>
+                    <li><a href="#"><i class="fa-solid fa-envelope"></i> Contact Us</a></li>
+                 </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                     </div>
+                <div class="header-right">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <i class="fa-solid fa-bell"></i>
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span class="user-profile-toggle"><i class="fa-solid fa-caret-down"></i></span>
+                </div>
+            </header>
+
+            <div id="dashboard-page" class="page active-page">
+                <div class="banner warning-banner">
+                    <div class="banner-content">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p><strong>Device Assignment Required!</strong> Unit # 1293 is a Smart Unit but requires assigning a SMU Device to the unit. If this is NOT a Smart Unit, PLEASE UPDATE SITELINK FOR THE CHANGES TO BE REFLECTED!</p>
+                    </div>
+                    <div class="banner-actions">
+                        <span>1/7</span>
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <button class="btn-link" id="banner-resolve-btn">RESOLVE</button>
+                    </div>
+                </div>
+
+                <div class="page-header">
+                    <h1>StorTropolis - Olathe</h1>
+                    <div class="search-container">
+                        <input type="text" id="global-search-bar" placeholder="Search...">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div id="search-results" class="search-results-dropdown"></div>
+                    </div>
+                </div>
+
+                <div class="tiles-container">
+                    <div class="tile blue-tile">
+                        <h2>223</h2>
+                        <p>Active Smart Units</p>
+                        <button class="tile-btn">VIEW DETAILS <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div class="tile green-tile">
+                        <h2>10</h2>
+                        <p>Authorized Accesses</p>
+                        <button class="tile-btn">VIEW DETAILS <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="incident-resolution-tile" class="tile red-tile tile-expandable">
+                        <h2><span id="incident-total">6</span> <span id="incident-overdue" class="overdue-count">(2!)</span></h2>
+                        <p>Incident Resolution</p>
+                        <button class="tile-btn" data-target="incident-resolution-content">VIEW DETAILS <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="facility-tasks-tile" class="tile orange-tile tile-expandable">
+                        <h2><span id="tasks-total">4</span> <span id="tasks-overdue" class="overdue-count">(1!)</span></h2>
+                        <p>Facility Tasks</p>
+                        <button class="tile-btn" data-target="facility-tasks-content">VIEW DETAILS <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="unhealthy-devices-tile" class="tile gray-tile tile-expandable">
+                        <h2><span id="unhealthy-total">5</span></h2>
+                        <p>Manage Unhealthy Devices</p>
+                        <button class="tile-btn" data-target="unhealthy-devices-content">VIEW DETAILS <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <div id="incident-resolution-content" class="expanded-content"></div>
+                <div id="facility-tasks-content" class="expanded-content"></div>
+                <div id="unhealthy-devices-content" class="expanded-content"></div>
+
+                 <div class="panels-container">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-paper-plane"></i> Demo Smart Experience</h3>
+                        </div>
+                        <div class="panel-body">
+                             <p>Send a Demo Message</p>
+                             <input type="text" placeholder="First Name">
+                             <input type="text" placeholder="Last Name">
+                             <input type="text" placeholder="Primary Mobile Phone *">
+                             <div class="panel-actions">
+                                 <button class="btn-secondary">DEMO MESSAGE</button>
+                                 <button class="btn-secondary">DEMO UNIT</button>
+                                 <button class="btn-primary">ADD RENTER</button>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Active Smart Unit Activity</h3>
+                            <div class="panel-controls">TODAY | 2D | 1W</div>
+                        </div>
+                         <div class="panel-body activity-feed">
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ B17 today 1:49:42 p.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ B14 today 1:40:13 p.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ A0329 today 1:39:17 p.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ A0417 today 1:33:29 p.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ C0026 today 1:11:37 p.m.</p>
+                         </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Vacant Smart Unit Activity</h3>
+                            <div class="panel-controls">TODAY | 2D | 1W</div>
+                        </div>
+                         <div class="panel-body activity-feed">
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Day Time Extended Motion</strong> @ A0802 today 11:28:35 a.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ A2085 Tue 12:03:11 p.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ A3224 Tue 11:19:03 a.m.</p>
+                             <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ A3132 Tue 11:18:28 a.m.</p>
+                              <p><i class="fa-solid fa-person-running"></i> <strong>Active Motion</strong> @ C0089 Tue 10:54:33 p.m.</p>
+                         </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Concerning Activity</h3>
+                        </div>
+                        <div class="panel-body">
+                             <p><i class="fa-regular fa-calendar-check"></i> No Recent Activity</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="renters-profile-page" class="page"></div>
+
+            <div id="assign-devices-page" class="page"></div>
+        </main>
+    </div>
+
+    <div id="modal-backdrop" class="hidden"></div>
+    <div id="incident-resolution-modal" class="modal hidden"></div>
+    <div id="pre-install-modal" class="modal hidden"></div>
+    <div id="remove-overlocks-modal" class="modal hidden"></div>
+    <div id="walkaround-modal" class="modal hidden"></div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE MANAGEMENT ---
+            const state = {
+                incidents: {
+                    total: 6,
+                    overdue: 2,
+                    tasks: [
+                        { id: 'inc1', unit: 'Bay Door', device: 'RBA2114', desc: 'After Access Hours - Door Open / Close', start: 'Sep 30, 2025 @ 11:55 pm', duration: '10 minutes', status: 'Overdue!', due: '10/2/2025' },
+                        { id: 'inc2', unit: '1011', device: 'BRG3777', desc: 'After Access Hours - Door Open / Close', start: 'Sep 30, 2025 @ 11:57 pm', duration: '<1 minute', status: 'Overdue!', due: '10/3/2025' },
+                        { id: 'inc3', unit: '2137', device: 'CE51192', desc: 'Unauthorized Smart Unit Motion', start: 'Oct 1, 2025 @ 10:01 am', duration: '<1 minute', status: 'To-Do', due: '10/3/2025' },
+                        { id: 'inc4', unit: '2135', device: 'CE51988', desc: 'After Access Hours - Smart Unit Motion', start: 'Oct 1, 2025 @ 11:22 pm', duration: '2 minutes', status: 'To-Do', due: '10/3/2025' },
+                        { id: 'inc5', unit: '2133', device: 'CE52007', desc: 'Unauthorized Smart Unit Motion', start: 'Oct 2, 2025 @ 8:49 am', duration: '<1 minute', status: 'Pending', due: '10/4/2025' },
+                        { id: 'inc6', unit: 'Office Door', device: 'RBA0197', desc: 'After Access Hours - Door Open / Close', start: 'Oct 2, 2025 @ 7:31 pm', duration: '<1 minute', status: 'Pending', due: '10/4/2025' }
+                    ]
+                },
+                facilityTasks: {
+                    total: 4,
+                    overdue: 1,
+                    tasks: [
+                        { id: 'ft1', location: 'StorTropolis - Olathe', type: 'Pre-Install Devices', name: 'Pre-Install Devices in 3 Vacant Units', assignee: 'Manager', created: '9/29/2025', status: 'Overdue!', priority: 'Critical', due: '10/2/2025' },
+                        { id: 'ft2', location: 'StorTropolis - Olathe', type: 'Remove Overlocks', name: 'Remove Overlocks from Unit(s) 1234, 2111', assignee: 'Manager', created: '10/2/2025', status: 'To-Do', priority: 'Severe', due: '10/3/2025' },
+                        { id: 'ft3', location: 'StorTropolis - Olathe', type: 'Walkaround / Checklist', name: 'Daily Facility Checklist', assignee: 'Manager', created: '10/3/2025', status: 'To-Do', priority: 'Critical', due: '10/3/2025' },
+                        { id: 'ft4', location: 'Unit # 1293', type: 'Smart Unit QoS', name: 'Coordinate with Mike Smith in Unit 1293 to assign & mount SMU Device', assignee: 'Manager', created: '10/3/2025', status: 'To-Do', priority: 'Critical', due: '10/3/2025' }
+                    ]
+                },
+                unhealthyDevices: {
+                    total: 5,
+                    devices: [
+                        { id: 'ud1', unit: '014', firstName: 'Mandi', lastName: 'Raymond', device: 'BN00234', status: 'offline', lastMotion: '1 month ago' },
+                        { id: 'ud2', unit: '113', firstName: 'Elizabeth', lastName: 'Reynolds', device: 'CE00131', status: 'offline', lastMotion: 'More than a year ago' },
+                        { id: 'ud3', unit: '126', firstName: 'Marion', lastName: 'Coolbaugh', device: 'BJ01185', status: 'offline', lastMotion: '5 months ago' },
+                        { id: 'ud4', unit: '130', firstName: 'Jamie', lastName: 'Icenhower', device: 'BF01596', status: 'low-battery', lastMotion: '3 weeks ago' },
+                        { id: 'ud5', unit: '149', firstName: 'Kelli', lastName: 'Hodges', device: 'BN00474', status: 'offline', lastMotion: 'More than a year ago' }
+                    ]
+                },
+                walkaroundProgress: {}, // To store checkbox states
+            };
+
+            // --- DOM Elements ---
+            const pages = document.querySelectorAll('.page');
+            const dashboardPage = document.getElementById('dashboard-page');
+            const rentersProfilePage = document.getElementById('renters-profile-page');
+            const assignDevicesPage = document.getElementById('assign-devices-page');
+            const modalBackdrop = document.getElementById('modal-backdrop');
+
+            // --- UTILITY FUNCTIONS ---
+            const showPage = (pageToShow) => {
+                pages.forEach(page => page.classList.remove('active-page'));
+                pageToShow.classList.add('active-page');
+            };
+
+            const showModal = (modal) => {
+                modalBackdrop.classList.remove('hidden');
+                modal.classList.remove('hidden');
+            };
+
+            const hideAllModals = () => {
+                document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+                modalBackdrop.classList.add('hidden');
+            };
+
+            const updateTileCounts = () => {
+                // Incident Resolution Tile
+                document.getElementById('incident-total').textContent = state.incidents.total;
+                const incidentOverdueEl = document.getElementById('incident-overdue');
+                incidentOverdueEl.textContent = state.incidents.overdue > 0 ? `(${state.incidents.overdue}!)` : '';
+
+                // Facility Tasks Tile
+                document.getElementById('tasks-total').textContent = state.facilityTasks.total;
+                const tasksOverdueEl = document.getElementById('tasks-overdue');
+                tasksOverdueEl.textContent = state.facilityTasks.overdue > 0 ? `(${state.facilityTasks.overdue}!)` : '';
+                
+                // Unhealthy Devices Tile
+                document.getElementById('unhealthy-total').textContent = state.unhealthyDevices.total;
+            };
+
+            // --- GLOBAL SEARCH ---
+            const globalSearch = document.getElementById('global-search-bar');
+            const searchResults = document.getElementById('search-results');
+
+            globalSearch.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                searchResults.innerHTML = '';
+                if (query.length > 1 && 'chad manspeaker'.includes(query)) {
+                    const resultItem = document.createElement('div');
+                    resultItem.textContent = 'Chad Manspeaker';
+                    resultItem.onclick = () => {
+                        renderRentersProfile();
+                        showPage(rentersProfilePage);
+                        globalSearch.value = '';
+                        searchResults.innerHTML = '';
+                    };
+                    searchResults.appendChild(resultItem);
+                }
+            });
+            
+            // --- BANNER RESOLVE ---
+            document.getElementById('banner-resolve-btn').addEventListener('click', () => {
+                renderAssignDevicesPageForQoS('ft4'); // 'ft4' is the ID of the new task
+                showPage(assignDevicesPage);
+            });
+
+            // --- TILE EXPANSION ---
+            document.querySelectorAll('.tile-expandable .tile-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const content = document.getElementById(targetId);
+                    
+                    document.querySelectorAll('.expanded-content.visible').forEach(openContent => {
+                        if (openContent.id !== targetId) {
+                            openContent.classList.remove('visible');
+                        }
+                    });
+
+                    content.classList.toggle('visible');
+                    if (content.classList.contains('visible')) {
+                        switch (targetId) {
+                            case 'incident-resolution-content': renderIncidentResolutionTable(); break;
+                            case 'facility-tasks-content': renderFacilityTasksTable(); break;
+                            case 'unhealthy-devices-content': renderUnhealthyDevicesTable(); break;
+                        }
+                    }
+                });
+            });
+
+            // --- RENDER FUNCTIONS ---
+            const renderIncidentResolutionTable = () => {
+                const container = document.getElementById('incident-resolution-content');
+                container.innerHTML = `
+                    <div class="table-header">
+                        <h3>Incident Resolution</h3>
+                        <input type="text" placeholder="Search..." style="width: 250px; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color);">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Actions</th><th>Smart Unit # / Zone</th><th>Device ID</th><th>Incident Description</th>
+                                <th>Incident Started At</th><th>Incident Duration</th><th>Task Status</th><th>Task Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>${state.incidents.tasks.map(task => `
+                            <tr data-task-id="${task.id}">
+                                <td><button class="btn-resolve" data-task-id="${task.id}"><i class="fa-solid fa-triangle-exclamation"></i> RESOLVE</button></td>
+                                <td>${task.unit}</td><td>${task.device}</td><td>${task.desc}</td><td>${task.start}</td>
+                                <td>${task.duration}</td><td><span class="status status-${task.status.toLowerCase().replace('!','').replace('-','')}">${task.status}</span></td><td>${task.due}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>`;
+                
+                container.querySelectorAll('.btn-resolve').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const taskId = e.currentTarget.dataset.taskId;
+                        const task = state.incidents.tasks.find(t => t.id === taskId);
+                        renderIncidentResolutionModal(task);
+                        showModal(document.getElementById('incident-resolution-modal'));
+                    });
+                });
+            };
+            
+            const renderFacilityTasksTable = () => {
+                const container = document.getElementById('facility-tasks-content');
+                container.innerHTML = `
+                    <div class="table-header">
+                        <h3>Facility Tasks</h3>
+                        <div class="table-filters">
+                            <select><option>Select User</option><option>Manager</option></select>
+                            <select><option>Task Status</option><option>To-Do</option><option>Overdue!</option><option>Pending</option></select>
+                            <div class="date-filter">TODAY | 2D | 1W | CUSTOM</div>
+                            <button class="btn btn-secondary">FILTER</button>
+                            <input type="text" placeholder="Search..." style="width: 200px;">
+                        </div>
+                        <button class="btn btn-green">ADD NEW TASK</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Actions</th><th>Location</th><th>Task Type</th><th>Task Name</th><th>Assignee</th>
+                                <th>Task Created Date</th><th>Task Status</th><th>Task Priority</th><th>Task Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>${state.facilityTasks.tasks.map(task => `
+                            <tr data-task-id="${task.id}">
+                                <td><button class="btn-resolve" data-task-type="${task.type}" data-task-id="${task.id}"><i class="fa-solid fa-triangle-exclamation"></i> RESOLVE</button></td>
+                                <td>${task.location}</td><td>${task.type}</td><td>${task.name}</td><td>${task.assignee}</td>
+                                <td>${task.created}</td><td><span class="status status-${task.status.toLowerCase().replace('!','').replace('-','')}">${task.status}</span></td>
+                                <td><span class="status status-${task.priority.toLowerCase()}">${task.priority}</span></td><td>${task.due}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>`;
+
+                container.querySelectorAll('.btn-resolve').forEach(btn => {
+                   btn.addEventListener('click', e => {
+                       const taskType = e.currentTarget.dataset.taskType;
+                       const taskId = e.currentTarget.dataset.taskId;
+                       const task = state.facilityTasks.tasks.find(t => t.id === taskId);
+                       
+                       if (taskType === 'Smart Unit QoS') {
+                           renderAssignDevicesPageForQoS(taskId);
+                           showPage(assignDevicesPage);
+                       } else if (taskType === 'Pre-Install Devices') {
+                           renderPreInstallModal(task);
+                           showModal(document.getElementById('pre-install-modal'));
+                       } else if (taskType === 'Remove Overlocks') {
+                           renderRemoveOverlocksModal(task);
+                           showModal(document.getElementById('remove-overlocks-modal'));
+                       } else if (taskType === 'Walkaround / Checklist') {
+                           renderWalkaroundModal(task);
+                           showModal(document.getElementById('walkaround-modal'));
+                       }
+                   });
+                });
+            };
+
+            const renderUnhealthyDevicesTable = () => {
+                const container = document.getElementById('unhealthy-devices-content');
+                container.innerHTML = `
+                    <div class="table-header">
+                        <h3>Manage Unhealthy Devices</h3>
+                        <input type="text" placeholder="Search..." style="width: 250px; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color);">
+                    </div>
+                    <table>
+                        <thead><tr><th>Actions</th><th>Smart Unit #</th><th>First Name</th><th>Last Name</th><th>Assigned Device</th><th>Device Status</th><th>Last Motion</th></tr></thead>
+                        <tbody>${state.unhealthyDevices.devices.map(device => `
+                            <tr data-device-id="${device.id}">
+                                <td><button class="btn-resolve" data-device-id="${device.id}"><i class="fa-solid fa-wrench"></i> RESOLVE</button></td>
+                                <td>${device.unit}</td><td>${device.firstName}</td><td>${device.lastName}</td><td>${device.device}</td>
+                                <td>${device.status === 'low-battery' ? '<i class="fa-solid fa-battery-quarter" style="color:red;"></i>' : '<i class="fa-solid fa-circle-xmark" style="color:red;"></i>'}</td>
+                                <td>${device.lastMotion}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>`;
+
+                container.querySelectorAll('.btn-resolve').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const deviceId = e.currentTarget.dataset.deviceId;
+                        renderAssignDevicesPage(deviceId);
+                        showPage(assignDevicesPage);
+                    });
+                });
+            };
+            
+            const renderRentersProfile = () => {
+                rentersProfilePage.innerHTML = `
+                    <div class="page-header-alt">
+                        <h2><a href="#" id="back-to-dashboard-renter" class="back-link"><i class="fa-solid fa-chevron-left"></i></a> Renters > Chad Manspeaker</h2>
+                        <button class="btn btn-secondary">ACCOUNT HISTORY</button>
+                    </div>
+                    <div class="profile-grid">
+                        <div>
+                            <div class="profile-card">
+                                <div class="card-header"><h3>Renter Information</h3></div>
+                                <div class="form-grid">
+                                    <div><label>First Name</label><input type="text" value="Chad" disabled></div>
+                                    <div><label>Last Name</label><input type="text" value="Manspeaker" disabled></div>
+                                </div>
+                                <div class="form-group"><br><label>Primary Mobile Phone *</label><input type="text" value="(785) 220-9493" disabled></div>
+                                <div class="form-group"><label>Secondary Mobile Phone</label><input type="text" id="secondary-phone" placeholder="Enter number"></div>
+                                <div class="form-group"><label>Email</label><input type="text" value="cmanspeaker@ulynix.com" disabled></div><br>
+                                <button class="btn btn-red">DISABLE RENTER</button><button class="btn btn-secondary">REMOVE RENTER</button>
+                                <button class="btn btn-green" id="save-renter-btn" style="float: right;">SAVE RENTER</button>
+                            </div>
+                            <div class="profile-card">
+                                <div class="card-header"><h3>Smart Unit Information</h3></div>
+                                <p><strong>Smart Unit #:</strong> A1002</p><p><strong>Unit Type:</strong> Smart Unit Temp Drive Up (10x20)</p><p><strong>Unit Amenities:</strong> Exterior, Rollup, Climate Controlled</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="profile-card"><div class="card-header"><h3>Assigned Devices</h3> <button class="btn btn-secondary"><i class="fa-solid fa-gear"></i> MANAGE</button></div></div>
+                            <div class="profile-card"><div class="card-header"><h3>Incident History</h3></div></div>
+                            <div class="profile-card"><div class="card-header"><h3>Temperature & Humidity</h3></div></div>
+                        </div>
+                    </div>`;
+                
+                document.getElementById('back-to-dashboard-renter').addEventListener('click', (e) => { e.preventDefault(); showPage(dashboardPage); });
+                document.getElementById('save-renter-btn').addEventListener('click', () => {
+                    const phone = document.getElementById('secondary-phone').value;
+                    alert(phone ? `Secondary phone number '${phone}' saved!` : 'No secondary phone number entered to save.');
+                });
+            };
+            
+            const renderAssignDevicesPage = (originatingDeviceId) => {
+                assignDevicesPage.innerHTML = `
+                    <div class="content-wrapper">
+                        <a href="#" class="back-link back-to-dashboard"><i class="fa-solid fa-chevron-left"></i></a>
+                        <h2>Smart Units > 011 > Assigned Devices</h2>
+                        <div class="inventory-container">
+                            <div class="inventory-box">
+                                <div class="inventory-box-header"><h3>Assigned Devices</h3></div>
+                                <table id="assigned-devices-table">
+                                    <thead><tr><th>Device #</th><th>Device Health</th><th>Actions</th></tr></thead>
+                                    <tbody><tr><td>BE00696</td><td><i class="fa-solid fa-arrows-rotate"></i></td><td><button class="btn btn-red">REMOVE DEVICE</button></td></tr></tbody>
+                                </table>
+                            </div>
+                            <div class="inventory-box">
+                                <div class="inventory-box-header">
+                                    <h3>Available Device Inventory</h3>
+                                    <input type="text" placeholder="Search..." style="width: 150px; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color);">
+                                </div>
+                                 <table>
+                                    <thead><tr><th>Device #</th><th>Device Health</th><th>Actions</th></tr></thead>
+                                    <tbody>
+                                        <tr data-device-id="CD00842">
+                                            <td>CD00842 <span class="low-battery">Low Batt</span></td>
+                                            <td><div class="device-health"><i class="fa-solid fa-battery-half" style="color:orange;"></i></div></td>
+                                            <td><button class="btn btn-green assign-btn" data-device-id="CD00842" data-origin-id="${originatingDeviceId}" data-origin-type="unhealthy"><ASSIGN DEVICE</button></td>
+                                        </tr>
+                                        <tr data-device-id="RB00004">
+                                            <td>RB00004</td>
+                                            <td><div class="device-health"><i class="fa-solid fa-battery-full" style="color:green;"></i></div></td>
+                                            <td><button class="btn btn-green assign-btn" data-device-id="RB00004" data-origin-id="${originatingDeviceId}" data-origin-type="unhealthy">ASSIGN DEVICE</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`;
+                addAssignPageListeners();
+            };
+
+            const renderAssignDevicesPageForQoS = (taskId) => {
+                assignDevicesPage.innerHTML = `
+                    <div class="content-wrapper">
+                        <a href="#" class="back-link back-to-dashboard"><i class="fa-solid fa-chevron-left"></i></a>
+                        <h2>Smart Units > 1293 > Assigned Devices</h2>
+                        <div class="inventory-container">
+                            <div class="inventory-box">
+                                <div class="inventory-box-header"><h3>Assigned Devices</h3></div>
+                                <table id="assigned-devices-table">
+                                    <thead><tr><th>Device #</th><th>Device Health</th><th>Actions</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div class="inventory-box">
+                                <div class="inventory-box-header">
+                                    <h3>Available Device Inventory</h3>
+                                    <input type="text" placeholder="Search..." style="width: 150px; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color);">
+                                </div>
+                                 <table>
+                                    <thead><tr><th>Device #</th><th>Device Health</th><th>Actions</th></tr></thead>
+                                    <tbody>
+                                        <tr data-device-id="CD00842">
+                                            <td>CD00842 <span class="low-battery">Low Batt</span></td>
+                                            <td><div class="device-health"><i class="fa-solid fa-battery-half" style="color:orange;"></i></div></td>
+                                            <td><button class="btn btn-green assign-btn" data-device-id="CD00842" data-origin-id="${taskId}" data-origin-type="qos">ASSIGN DEVICE</button></td>
+                                        </tr>
+                                        <tr data-device-id="RB00004">
+                                            <td>RB00004</td>
+                                            <td><div class="device-health"><i class="fa-solid fa-battery-full" style="color:green;"></i></div></td>
+                                            <td><button class="btn btn-green assign-btn" data-device-id="RB00004" data-origin-id="${taskId}" data-origin-type="qos">ASSIGN DEVICE</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`;
+                addAssignPageListeners();
+            };
+
+            const addAssignPageListeners = () => {
+                document.querySelector('#assign-devices-page .back-to-dashboard').addEventListener('click', (e) => { e.preventDefault(); showPage(dashboardPage); });
+                assignDevicesPage.querySelectorAll('.assign-btn').forEach(btn => {
+                   btn.addEventListener('click', e => {
+                       const { deviceId, originId, originType } = e.currentTarget.dataset;
+                       
+                       if (originType === 'unhealthy') {
+                           state.unhealthyDevices.devices = state.unhealthyDevices.devices.filter(d => d.id !== originId);
+                           state.unhealthyDevices.total--;
+                           alert(`Device ${deviceId} assigned. This resolves the unhealthy device task.`);
+                           if (document.getElementById('unhealthy-devices-content').classList.contains('visible')) renderUnhealthyDevicesTable();
+                       } else if (originType === 'qos') {
+                           state.facilityTasks.tasks = state.facilityTasks.tasks.filter(t => t.id !== originId);
+                           state.facilityTasks.total--;
+                           alert(`Device ${deviceId} assigned to Unit 1293. This resolves the Facility Task.`);
+                           if (document.getElementById('facility-tasks-content').classList.contains('visible')) renderFacilityTasksTable();
+                       }
+                       
+                       updateTileCounts();
+                       showPage(dashboardPage);
+                   });
+                });
+            };
+
+            // --- MODAL RENDER FUNCTIONS ---
+            const renderIncidentResolutionModal = (task) => {
+                const modal = document.getElementById('incident-resolution-modal');
+                modal.innerHTML = `
+                    <div class="modal-header"><h2>Manage Task</h2><button class="close-modal-btn">&times;</button></div>
+                    <div class="modal-body">
+                        <div class="modal-grid-2">
+                            <div class="form-group"><label>Task Status</label>
+                                <select id="incident-task-status">
+                                    <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="To-Do" ${task.status === 'To-Do' ? 'selected' : ''}>To-Do</option>
+                                    <option value="Overdue!" ${task.status === 'Overdue!' ? 'selected' : ''}>Overdue!</option>
+                                    <option value="In Review">In Review</option><option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Task Type</label><input type="text" value="Incident Resolution" disabled></div>
+                            <div class="form-group"><label>Due Date</label><input type="text" value="${task.due}" disabled></div>
+                            <div class="form-group"><label>Assignee</label><select><option>Manager</option></select></div>
+                        </div>
+                        <div class="form-group"><label>Add Notes</label><textarea placeholder="Add notes..."></textarea></div>
+                        <div class="form-group"><label>Task Description</label><textarea disabled>Complete Incident Report for ${task.desc} on ${task.start}</textarea></div>
+                        <div class="modal-tabs"><div class="modal-tab active" data-tab="report">INCIDENT REPORT</div><div class="modal-tab" data-tab="history">HISTORY</div></div>
+                        <div id="report" class="modal-tab-content active">
+                            <div id="incident-error-message" class="error-message hidden">Please complete all required fields (*) in the Incident Report.</div>
+                            <div class="modal-grid-2">
+                                <div><p><strong>Did you complete a visual inspection? *</strong></p>
+                                    <input type="radio" name="inspection" value="yes" id="insp-yes"><label for="insp-yes"> Yes</label><br>
+                                    <input type="radio" name="inspection" value="no" id="insp-no"><label for="insp-no"> No</label><br>
+                                    <input type="radio" name="inspection" value="na" id="insp-na"><label for="insp-na"> N/A</label>
+                                </div>
+                                <div><p><strong>Did you detect a break in? *</strong></p>
+                                    <input type="radio" name="breakin" value="yes" id="break-yes"><label for="break-yes"> Yes</label><br>
+                                    <input type="radio" name="breakin" value="no" id="break-no"><label for="break-no"> No</label><br>
+                                    <input type="radio" name="breakin" value="na" id="break-na"><label for="break-na"> N/A</label>
+                                </div>
+                            </div>
+                            <p><strong>Add Pictures or Video from your device: *</strong></p><button class="icon-btn"><i class="fa-solid fa-camera"></i></button>
+                        </div>
+                        <div id="history" class="modal-tab-content"><p><strong>Oct 2, 2025:</strong> Task status changed to ${task.status}.</p><p><strong>Sep 30, 2025:</strong> Task created and assigned to Manager.</p></div>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-resolve" id="resolve-incident-btn" data-task-id="${task.id}"><i class="fa-solid fa-triangle-exclamation"></i> RESOLVE</button></div>`;
+                
+                modal.querySelector('.close-modal-btn').addEventListener('click', hideAllModals);
+                modal.querySelectorAll('.modal-tab').forEach(tab => {
+                   tab.addEventListener('click', e => {
+                       modal.querySelector('.modal-tab.active').classList.remove('active');
+                       modal.querySelector('.modal-tab-content.active').classList.remove('active');
+                       e.currentTarget.classList.add('active');
+                       document.getElementById(e.currentTarget.dataset.tab).classList.add('active');
+                   })
+                });
+                modal.querySelector('#resolve-incident-btn').addEventListener('click', e => {
+                    if (!modal.querySelector('input[name="inspection"]:checked') || !modal.querySelector('input[name="breakin"]:checked')) {
+                        modal.querySelector('#incident-error-message').classList.remove('hidden'); return;
+                    }
+                    const taskId = e.currentTarget.dataset.taskId;
+                    const taskToRemove = state.incidents.tasks.find(t => t.id === taskId);
+                    if (taskToRemove.status === 'Overdue!') state.incidents.overdue--;
+                    state.incidents.total--;
+                    state.incidents.tasks = state.incidents.tasks.filter(t => t.id !== taskId);
+                    hideAllModals(); updateTileCounts(); renderIncidentResolutionTable();
+                });
+            };
+            
+            const renderPreInstallModal = (task) => {
+                const modal = document.getElementById('pre-install-modal');
+                modal.innerHTML = `
+                    <div class="modal-header"><h2>Pre-Install Devices</h2><button class="close-modal-btn">&times;</button></div>
+                    <div class="modal-body">
+                        ${[...Array(3)].map(() => `
+                        <div class="form-row">
+                            <button class="icon-btn scan-btn"><i class="fa-solid fa-qrcode"></i></button>
+                            <select class="device-select"><option>Search by Device ID #</option></select>
+                            <select class="unit-select"><option>Select Unit</option><option>A101</option><option>B202</option><option>C303</option></select>
+                            <button class="btn btn-disabled assign-btn" disabled>ASSIGN</button>
+                        </div>`).join('')}
+                        <label>Add Comment:</label><textarea class="comment-box"></textarea>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-resolve btn-disabled" id="resolve-preinstall-btn" data-task-id="${task.id}" disabled><i class="fa-solid fa-triangle-exclamation"></i> RESOLVE</button></div>`;
+                
+                modal.querySelector('.close-modal-btn').addEventListener('click', hideAllModals);
+                let assignedCount = 0;
+                modal.querySelectorAll('.form-row').forEach(row => {
+                    const assignBtn = row.querySelector('.assign-btn');
+                    const checkEnableAssign = () => {
+                        if (row.querySelector('.device-select').value !== "Search by Device ID #" && row.querySelector('.unit-select').value !== "Select Unit") {
+                            assignBtn.disabled = false; assignBtn.classList.remove('btn-disabled');
+                        } else { assignBtn.disabled = true; assignBtn.classList.add('btn-disabled'); }
+                    };
+                    row.querySelector('.scan-btn').addEventListener('click', (e) => {
+                        const deviceSelect = e.currentTarget.closest('.form-row').querySelector('.device-select');
+                        deviceSelect.innerHTML = `<option>DEV${Math.floor(1000 + Math.random() * 9000)}</option>`; checkEnableAssign();
+                    });
+                    row.querySelectorAll('select').forEach(sel => sel.addEventListener('change', checkEnableAssign));
+                    assignBtn.addEventListener('click', () => {
+                        if (assignBtn.disabled) return;
+                        assignedCount++; assignBtn.textContent = 'ASSIGNED'; assignBtn.classList.add('btn-green', 'btn-disabled'); assignBtn.disabled = true;
+                        row.querySelectorAll('button, select').forEach(el => el.disabled = true);
+                        if (assignedCount === 3) {
+                            document.getElementById('resolve-preinstall-btn').disabled = false;
+                            document.getElementById('resolve-preinstall-btn').classList.remove('btn-disabled');
+                        }
+                    });
+                });
+                document.getElementById('resolve-preinstall-btn').addEventListener('click', e => {
+                    if(e.currentTarget.disabled) return;
+                    const taskId = e.currentTarget.dataset.taskId;
+                    const taskToRemove = state.facilityTasks.tasks.find(t => t.id === taskId);
+                    if (taskToRemove.status === 'Overdue!') state.facilityTasks.overdue--;
+                    state.facilityTasks.total--; state.facilityTasks.tasks = state.facilityTasks.tasks.filter(t => t.id !== taskId);
+                    hideAllModals(); updateTileCounts(); renderFacilityTasksTable();
+                });
+            };
+            
+            const renderRemoveOverlocksModal = (task) => {
+                const modal = document.getElementById('remove-overlocks-modal');
+                modal.innerHTML = `
+                     <div class="modal-header"><h2>Manage Overlocks</h2><button class="close-modal-btn">&times;</button></div>
+                     <div class="modal-body" style="text-align:center;">
+                        <table>
+                            <thead><tr><th>Removed</th><th>Unit #</th><th>Comment</th><th>Add Picture</th></tr></thead>
+                            <tbody>
+                                <tr><td><input type="checkbox" class="overlock-check"></td><td>1234</td><td><input type="text" placeholder="Add..."></td><td><button class="icon-btn"><i class="fa-solid fa-camera"></i></button></td></tr>
+                                <tr><td><input type="checkbox" class="overlock-check"></td><td>2111</td><td><input type="text" placeholder="Add..."></td><td><button class="icon-btn"><i class="fa-solid fa-camera"></i></button></td></tr>
+                            </tbody>
+                        </table><br>
+                        <button class="btn btn-disabled" id="remove-overlocks-btn" data-task-id="${task.id}" disabled>REMOVE OVERLOCKS</button>
+                     </div>`;
+                modal.querySelector('.close-modal-btn').addEventListener('click', hideAllModals);
+                const checkboxes = modal.querySelectorAll('.overlock-check');
+                const removeBtn = modal.querySelector('#remove-overlocks-btn');
+                checkboxes.forEach(cb => cb.addEventListener('change', () => {
+                    const allChecked = [...checkboxes].every(c => c.checked);
+                    removeBtn.disabled = !allChecked;
+                    removeBtn.classList.toggle('btn-disabled', !allChecked);
+                }));
+                removeBtn.addEventListener('click', e => {
+                    if (e.currentTarget.disabled) return;
+                    const taskId = e.currentTarget.dataset.taskId;
+                    const taskToRemove = state.facilityTasks.tasks.find(t => t.id === taskId);
+                    if (taskToRemove.status === 'Overdue!') state.facilityTasks.overdue--;
+                    state.facilityTasks.total--; state.facilityTasks.tasks = state.facilityTasks.tasks.filter(t => t.id !== taskId);
+                    hideAllModals(); updateTileCounts(); renderFacilityTasksTable();
+                });
+            };
+            
+            const renderWalkaroundModal = (task) => {
+                const modal = document.getElementById('walkaround-modal');
+                const progress = state.walkaroundProgress[task.id] || {};
+                modal.innerHTML = `
+                    <div class="modal-header"><h2>Walkaround / Checklist</h2><button class="close-modal-btn">&times;</button></div>
+                    <div class="modal-body">
+                        <h4>Perimeter Walk</h4>
+                        <label><input type="checkbox" class="walkaround-check" data-item="gate" ${progress.gate ? 'checked' : ''}> Check gate functionality</label><br>
+                        <label><input type="checkbox" class="walkaround-check" data-item="fence" ${progress.fence ? 'checked' : ''}> Inspect fence line for damage</label><br>
+                        <h4>Building Exteriors</h4>
+                        <label><input type="checkbox" class="walkaround-check" data-item="lighting" ${progress.lighting ? 'checked' : ''}> Check exterior lighting</label><br>
+                        <label><input type="checkbox" class="walkaround-check" data-item="doors" ${progress.doors ? 'checked' : ''}> Inspect all exterior doors</label><br>
+                        <h4>Common Areas</h4>
+                        <label><input type="checkbox" class="walkaround-check" data-item="office" ${progress.office ? 'checked' : ''}> Tidy up office area</label><br><br>
+                        <label>Comments</label><textarea id="walkaround-comments">${progress.comments || ''}</textarea>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-resolve btn-disabled" id="resolve-walkaround-btn" data-task-id="${task.id}" disabled><i class="fa-solid fa-check"></i> RESOLVE</button></div>`;
+
+                const checkboxes = modal.querySelectorAll('.walkaround-check');
+                const resolveBtn = modal.querySelector('#resolve-walkaround-btn');
+                const checkCompletion = () => {
+                    const allChecked = [...checkboxes].every(cb => cb.checked);
+                    resolveBtn.disabled = !allChecked; resolveBtn.classList.toggle('btn-disabled', !allChecked);
+                };
+                const saveProgress = () => {
+                    const currentProgress = { comments: modal.querySelector('#walkaround-comments').value };
+                    checkboxes.forEach(cb => { currentProgress[cb.dataset.item] = cb.checked; });
+                    state.walkaroundProgress[task.id] = currentProgress;
+                };
+                modal.querySelector('.close-modal-btn').addEventListener('click', () => { saveProgress(); hideAllModals(); });
+                checkboxes.forEach(cb => cb.addEventListener('change', checkCompletion));
+                resolveBtn.addEventListener('click', e => {
+                    if (e.currentTarget.disabled) return;
+                    const taskId = e.currentTarget.dataset.taskId;
+                    const taskToRemove = state.facilityTasks.tasks.find(t => t.id === taskId);
+                    if (taskToRemove.status === 'Overdue!') state.facilityTasks.overdue--;
+                    state.facilityTasks.total--; state.facilityTasks.tasks = state.facilityTasks.tasks.filter(t => t.id !== taskId);
+                    delete state.walkaroundProgress[task.id];
+                    hideAllModals(); updateTileCounts(); renderFacilityTasksTable();
+                });
+                checkCompletion();
+            };
+
+            // --- INITIALIZATION ---
+            updateTileCounts();
+            modalBackdrop.addEventListener('click', hideAllModals);
+        });
+    </script>
+</body>
+</html>
